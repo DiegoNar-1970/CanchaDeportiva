@@ -2,6 +2,11 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import {UserRouter} from './Routers/UserRouter.js';
+import {CanchaRouter} from './Routers/CanchaRouter.js';
+import {HorarioDisponibleRouter} from './Routers/HorarioDisponibleRouter.js';
+import {ReservaRouter} from './Routers/ReservaRouter.js';
+import {FacturaRouter} from './Routers/FacturaRouter.js';
+
 
 const PORT = process.env.APP_PORT ?? 3000;
 const app = express();
@@ -24,6 +29,10 @@ app.disable('x-powered-by');
 //Rutas
 
 app.use('/user', UserRouter);
+app.use('/user', CanchaRouter);
+app.use('/user', HorarioDisponibleRouter);
+app.use('/user', ReservaRouter);
+app.use('/user', FacturaRouter);
 
 
 
