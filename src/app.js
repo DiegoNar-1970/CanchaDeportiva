@@ -14,7 +14,11 @@ const app = express();
 
 //Configuracion del servidor
 //Usamos cors para permitir solicitudes desde otros dominios
-app.use(cors());
+app.use(cors(
+  {
+    origin: '*', // Permite solicitudes desde cualquier origen
+  }
+));
 
 //esta lina es para que el servidor pueda leer las variables de entorno
 dotenv.config();
