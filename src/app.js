@@ -20,6 +20,8 @@ app.use(cors(
   }
 ));
 
+app.use(express.json());
+
 //esta lina es para que el servidor pueda leer las variables de entorno
 dotenv.config();
 
@@ -33,10 +35,10 @@ app.disable('x-powered-by');
 //Rutas
 
 app.use('/user', UserRouter);
-app.use('/user', CanchaRouter);
-app.use('/user', HorarioDisponibleRouter);
-app.use('/user', ReservaRouter);
-app.use('/user', FacturaRouter);
+app.use('/cancha', CanchaRouter);
+app.use('/horario', HorarioDisponibleRouter);
+app.use('/reserva', ReservaRouter);
+app.use('/factura', FacturaRouter);
 
 
 

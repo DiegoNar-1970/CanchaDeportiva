@@ -5,3 +5,4 @@ export const UserRouter = Router();
 
 UserRouter.post("/create", UserController.createUser);
 UserRouter.get("/get-all", UserController.getAllUsers);
+UserRouter.post("/email", UserController.getUserByEmail);

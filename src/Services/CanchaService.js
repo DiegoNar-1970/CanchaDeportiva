@@ -4,6 +4,9 @@ export class CanchaService {
     static async createCancha(canchaData) {
         try {
             const canchaId = await CanchaModel.createCancha(canchaData);
+            if (canchaId.error) {
+                return { error: canchaId.error };
+            }
             return canchaId;
         } catch (error) {
             console.error("Error creating cancha in service:", error);

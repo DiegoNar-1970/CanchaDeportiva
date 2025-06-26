@@ -21,5 +21,17 @@ export class UserService {
             throw error;
         }
     }
-    
+    static async getUserByEmail(email) {
+        try {
+            const user = await UserModel.getUserByEmail(email);
+            if(user.status) {
+                return { message: user.message, status: user.status }; // Handle case where user is not found
+            }
+            return user;
+        } catch (error) {
+            console.error("Error fetching user by email in service:", error);
+            throw error;
+        }
+    }
+
 }

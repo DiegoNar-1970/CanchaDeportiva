@@ -3,24 +3,6 @@ import { ReservaModel } from '../Models/ReservaModel.js';
 export class ReservaService {
     static async createReserva(reservaData) {
         try {
-            // Validar que la cancha esté disponible en el horario solicitado
-            const reservasExistentes = await ReservaModel.getReservasByCanchaAndDate(
-                reservaData.id_cancha, 
-                reservaData.fecha_reserva
-            );
-
-            const solapamiento = reservasExistentes.some(reserva => {
-                return (
-                    (reserva.hora_inicio < reservaData.hora_fin && 
-                     reserva.hora_fin > reservaData.hora_inicio) &&
-                    reserva.estado !== 'cancelada'
-                );
-            });
-
-            if (solapamiento) {
-                throw new Error("La cancha no está disponible en el horario solicitado");
-            }
-
             const reservaId = await ReservaModel.createReserva(reservaData);
             return reservaId;
         } catch (error) {
@@ -75,6 +57,16 @@ export class ReservaService {
             return result;
         } catch (error) {
             console.error("Error deleting reserva in service:", error);
+            throw error;
+        }
+    }
+    
+    static getAllReservas = async () => {
+        try {
+            const reservas = await ReservaModel.getAllReservas();
+            return reservas;
+        } catch (error) {
+            console.error("Error fetching all reservas in service:", error);
             throw error;
         }
     }

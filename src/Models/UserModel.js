@@ -7,18 +7,18 @@ export class UserModel {
     static async createUser(userData) {
         try{
             //desestructuramos para extraer name, email, y password
-            const { nombre, email, contraseña, rol } = userData;
+            const { name, email, password, rol } = userData;
+            console.log("esto llego:", userData);
 
-            if (!nombre || !email || !contraseña || !rol) {
+            if (!name || !email || !password || !rol) {
                 throw new Error("All fields are required");
             }
             
-            //creamos la query SQL para insertar un nuevo usuario
             const query = "INSERT INTO usuario (nombre, email, contraseña, rol) VALUES ($1, $2, $3, $4) RETURNING *";
 
             //Ejecutamos la query con los datos del usuario
-            const {rows} = await Connection.query(query, [nombre, email, contraseña, rol]);
-            return rows
+            const {rows} = await Connection.query(query, [name, email, password, rol]);
+            return rows[0]
         }catch (error) {
             console.error("Error creating user:", error);
             throw error;
@@ -35,5 +35,19 @@ export class UserModel {
             throw error;
         }
     }
+    static async getUserByEmail(email) {
+        const query = "SELECT * FROM usuario WHERE email = $1";
+        try {
+            const { rows } = await Connection.query(query, [email]);
 
+            if (rows.length === 0) {
+                return { message: "User not found", status: "error" }; // No user found with the given email
+            }
+            
+            return rows[0];
+        } catch (error) {
+            console.error("Error fetching user by email:", error);
+            throw error;
+        }
+    }
 }

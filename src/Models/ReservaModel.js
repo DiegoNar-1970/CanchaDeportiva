@@ -1,13 +1,38 @@
 import { Connection } from "../Config/DbConfig.js";
 
 export class ReservaModel {
+
+    static async checkCanchaAvailability(id_cancha, fecha_reserva, hora_inicio, hora_fin) {
+         const query = `
+        SELECT * FROM RESERVA
+        WHERE id_cancha = $1
+            AND fecha_reserva = $2
+            AND (
+                (hora_inicio < $4 AND hora_fin > $3)
+            )
+        `;
+        try {
+            const { rows } = await Connection.query(query, [id_cancha, fecha_reserva, hora_inicio, hora_fin]);
+            return rows.length === 0; 
+        } catch (error) {
+            console.error("Error checking cancha availability:", error);
+            throw error;
+        }
+    }
+
     static async createReserva(reservaData) {
         try {
-            const { id_usuario, id_cancha, fecha_reserva, hora_inicio, hora_fin, estado, costo_total } = reservaData;
-
-            if (!id_usuario || !id_cancha || !fecha_reserva || !hora_inicio || !hora_fin || !estado || !costo_total) {
-                throw new Error("All fields are required");
+            const isAvailable = await this.checkCanchaAvailability(
+                reservaData.id_cancha,
+                reservaData.fecha_reserva,
+                reservaData.hora_inicio,
+                reservaData.hora_fin
+            );
+            if (!isAvailable) {
+                return { error: "La cancha no está disponible en el horario seleccionado." };
             }
+            console.log(reservaData,'estamos en el model')
+            const { id_usuario, id_cancha, fecha_reserva, hora_inicio, hora_fin, estado, costo_total } = reservaData;
 
             const query = `
                 INSERT INTO reserva 
@@ -18,7 +43,7 @@ export class ReservaModel {
             const { rows } = await Connection.query(query, [
                 id_usuario, id_cancha, fecha_reserva, hora_inicio, hora_fin, estado, costo_total
             ]);
-            return rows[0].id_reserva;
+            return rows[0];
         } catch (error) {
             console.error("Error creating reserva:", error);
             throw error;
@@ -97,6 +122,17 @@ export class ReservaModel {
             return rows[0];
         } catch (error) {
             console.error("Error deleting reserva:", error);
+            throw error;
+        }
+    }
+
+    static async getAllReservas(startDate, endDate) {
+        const query = `SELECT * FROM reserva`
+        try {
+            const { rows } = await Connection.query(query);
+            return rows;
+        } catch (error) {
+            console.error("Error fetching all reservas:", error);
             throw error;
         }
     }

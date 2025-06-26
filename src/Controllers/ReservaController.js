@@ -2,17 +2,16 @@ import { ReservaService } from "../Services/ReservaService.js";
 
 export class ReservaController {
     static async createReserva(req, res) {
+        
         try {
-            if (!req.body || Object.keys(req.body).length === 0) {
-                return res.status(400).json({ message: "Bad request: No data provided" });
-            }
-            
             const reservaData = req.body;
             const reservaId = await ReservaService.createReserva(reservaData);
-            
-            res.status(201).json({ 
+            if (reservaId.error) {
+                return res.status(400).json({ error: reservaId.error });
+            }
+            return res.status(201).json({ 
                 message: "Reserva creada exitosamente", 
-                reservaId 
+                reservaId: reservaId.id_reserva
             });
         } catch (error) {
             console.error("Error creating reserva in controller:", error);
@@ -86,6 +85,15 @@ export class ReservaController {
             res.status(200).json({ message: "Reserva eliminada exitosamente" });
         } catch (error) {
             console.error("Error deleting reserva in controller:", error);
+            res.status(500).json({ message: "Internal server error", error: error.message });
+        }
+    }
+    static async getAllReservas(req, res) {
+        try {
+            const reservas = await ReservaService.getAllReservas();
+            res.status(200).json(reservas);
+        } catch (error) {
+            console.error("Error fetching all reservas in controller:", error);
             res.status(500).json({ message: "Internal server error", error: error.message });
         }
     }
