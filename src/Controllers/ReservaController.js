@@ -5,11 +5,12 @@ export class ReservaController {
         
         try {
             const reservaData = req.body;
+            console.log(req.body)
             const reservaId = await ReservaService.createReserva(reservaData);
             if (reservaId.error) {
                 return res.status(400).json({ error: reservaId.error });
             }
-            return res.status(201).json({ 
+            return res.status(200).json({ 
                 message: "Reserva creada exitosamente", 
                 reservaId: reservaId.id_reserva
             });
@@ -26,11 +27,11 @@ export class ReservaController {
         try {
             const { id } = req.params;
             const reserva = await ReservaService.getReservaById(id);
-            
+
             if (!reserva) {
                 return res.status(404).json({ message: "Reserva no encontrada" });
             }
-            
+
             res.status(200).json(reserva);
         } catch (error) {
             console.error("Error fetching reserva by ID in controller:", error);
@@ -41,6 +42,7 @@ export class ReservaController {
     static async getReservasByUsuario(req, res) {
         try {
             const { id_usuario } = req.params;
+            console.log(id_usuario)
             const reservas = await ReservaService.getReservasByUsuario(id_usuario);
             
             res.status(200).json(reservas);
@@ -78,11 +80,11 @@ export class ReservaController {
     }
 
     static async deleteReserva(req, res) {
+        const { id } = req.params;
         try {
-            const { id } = req.params;
-            await ReservaService.deleteReserva(id);
-            
-            res.status(200).json({ message: "Reserva eliminada exitosamente" });
+            const reponse = await ReservaService.deleteReserva(id);
+
+            return res.status(200).json({ message: "Reserva eliminada exitosamente",reponse });
         } catch (error) {
             console.error("Error deleting reserva in controller:", error);
             res.status(500).json({ message: "Internal server error", error: error.message });
@@ -92,6 +94,16 @@ export class ReservaController {
         try {
             const reservas = await ReservaService.getAllReservas();
             res.status(200).json(reservas);
+        } catch (error) {
+            console.error("Error fetching all reservas in controller:", error);
+            res.status(500).json({ message: "Internal server error", error: error.message });
+        }
+    }
+    static async updateReserva(req, res) {
+        try {
+            const data = req.body
+            const reservas = await ReservaService.updateReserva(data);
+            res.status(200).json({reservas,message:'Reserva Actualizada'});
         } catch (error) {
             console.error("Error fetching all reservas in controller:", error);
             res.status(500).json({ message: "Internal server error", error: error.message });

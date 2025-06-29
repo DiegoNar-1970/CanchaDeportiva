@@ -4,12 +4,11 @@ export class ReservaModel {
 
     static async checkCanchaAvailability(id_cancha, fecha_reserva, hora_inicio, hora_fin) {
          const query = `
-        SELECT * FROM RESERVA
-        WHERE id_cancha = $1
+        SELECT * FROM reserva
+            WHERE id_cancha = $1
             AND fecha_reserva = $2
-            AND (
-                (hora_inicio < $4 AND hora_fin > $3)
-            )
+            AND hora_inicio = $3
+            AND hora_fin = $4
         `;
         try {
             const { rows } = await Connection.query(query, [id_cancha, fecha_reserva, hora_inicio, hora_fin]);
@@ -67,22 +66,42 @@ export class ReservaModel {
         }
     }
 
-    static async getReservasByUsuario(id_usuario) {
-        const query = `
-            SELECT r.*, c.nombre_cancha, c.tipo, c.precio_hora
-            FROM reserva r
-            JOIN cancha c ON r.id_cancha = c.id_cancha
-            WHERE r.id_usuario = $1
-            ORDER BY r.fecha_reserva DESC, r.hora_inicio DESC
-        `;
-        try {
-            const { rows } = await Connection.query(query, [id_usuario]);
-            return rows;
-        } catch (error) {
-            console.error("Error fetching reservas by usuario:", error);
-            throw error;
+static async getReservasByUsuario(id_usuario) {
+    const query = `
+        SELECT 
+            u.nombre AS nombre,
+            c.nombre_cancha,
+            c.tipo,
+            r.id_reserva,
+            r.id_usuario,
+            r.id_cancha,
+            r.fecha_reserva,
+            r.hora_inicio,
+            r.hora_fin,
+            r.estado,
+            r.costo_total,
+            c.img AS img
+        FROM 
+            RESERVA r
+        JOIN 
+            USUARIO u ON r.id_usuario = u.id_usuario
+        JOIN 
+            CANCHA c ON r.id_cancha = c.id_cancha
+        WHERE 
+            r.id_usuario = $1
+    `;
+    
+    try {
+        const { rows } = await Connection.query(query, [id_usuario]);
+        if (rows.length === 0) {
+            return { message: 'No se encontraron reservas' };
         }
+        return rows;
+    } catch (error) {
+        console.error("Error fetching reservas by usuario:", error);
+        throw error;
     }
+}
 
     static async updateReservaEstado(id_reserva, estado) {
         const query = `
@@ -116,9 +135,11 @@ export class ReservaModel {
     }
 
     static async deleteReserva(id_reserva) {
+        console.log(id_reserva)
         const query = "DELETE FROM reserva WHERE id_reserva = $1 RETURNING id_reserva";
         try {
             const { rows } = await Connection.query(query, [id_reserva]);
+            console.log(rows)
             return rows[0];
         } catch (error) {
             console.error("Error deleting reserva:", error);
@@ -131,6 +152,24 @@ export class ReservaModel {
         try {
             const { rows } = await Connection.query(query);
             return rows;
+        } catch (error) {
+            console.error("Error fetching all reservas:", error);
+            throw error;
+        }
+    }
+        static async updateReserva({id_reserva, hora_inicio, hora_fin, costo_total}) {
+        const query = `
+            UPDATE reserva
+            SET hora_inicio = $1,
+                hora_fin = $2,
+                costo_total = $3
+            WHERE id_reserva     = $4
+            RETURNING *;
+        `;
+        const values = [hora_inicio, hora_fin, costo_total, id_reserva];
+        try {
+            const { rows } = await Connection.query(query, values);
+            return rows[0];
         } catch (error) {
             console.error("Error fetching all reservas:", error);
             throw error;

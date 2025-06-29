@@ -70,4 +70,13 @@ export class ReservaService {
             throw error;
         }
     }
+    static updateReserva = async (data) => {
+        try {
+            const reservas = await ReservaModel.updateReserva(data);
+            return reservas;
+        } catch (error) {
+            console.error("Error fetching all reservas in service:", error);
+            throw error;
+        }
+    }
 }
