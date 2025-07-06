@@ -3,10 +3,8 @@ import { CanchaService } from "../Services/CanchaService.js";
 export class CanchaController {
     static async createCancha(req, res) {
         try {
-            if (!req.body || Object.keys(req.body).length === 0) {
-                return res.status(400).json({ message: "Bad request: No data provided" });
-            }
             const canchaData = req.body;
+            console.log(req.body)
             const canchaId = await CanchaService.createCancha(canchaData);
             res.status(201).json({ message: "Cancha created successfully", canchaId });
         } catch (error) {

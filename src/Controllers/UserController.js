@@ -4,16 +4,13 @@ export class UserController {
 
     static async createUser(req, res) {// Log the request body for debugging
         try {
-            if (!req.body || Object.keys(req.body).length === 0) {
-                return res.status(400).json({ message: "Bad request: No data provided" });
-            }
+
             const userData = req.body;
-            console.log("Request body in createUser:", userData);
 
             const userId = await UserService.createUser(userData);
             
             console.log("User created with ID:", userId);
-            res.status(201).json({ message: "User created successfully", user });
+            res.status(201).json({ message: "User created successfully", user:userId });
 
         }catch (error) {
 

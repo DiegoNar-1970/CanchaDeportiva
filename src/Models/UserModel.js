@@ -7,17 +7,13 @@ export class UserModel {
     static async createUser(userData) {
         try{
             //desestructuramos para extraer name, email, y password
-            const { name, email, password, rol } = userData;
+            const { nombre, email, password, rol } = userData;
             console.log("esto llego:", userData);
 
-            if (!name || !email || !password || !rol) {
-                throw new Error("All fields are required");
-            }
-            
             const query = "INSERT INTO usuario (nombre, email, contraseña, rol) VALUES ($1, $2, $3, $4) RETURNING *";
 
             //Ejecutamos la query con los datos del usuario
-            const {rows} = await Connection.query(query, [name, email, password, rol]);
+            const {rows} = await Connection.query(query, [nombre, email, password, rol]);
             return rows[0]
         }catch (error) {
             console.error("Error creating user:", error);

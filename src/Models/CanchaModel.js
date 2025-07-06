@@ -1,16 +1,14 @@
 import { Connection } from "../Config/DbConfig.js";
 
 export class CanchaModel {
+
     static async createCancha(canchaData) {
         try {
-            const { nombre_cancha, tipo, precio_hora, estado } = canchaData;
+            const { nombre_cancha, tipo, precio_hora, estado,img } = canchaData;
 
-            if (!nombre_cancha || !tipo || !precio_hora || !estado) {
-                throw new Error("All fields are required");
-            }
-
-            const query = "INSERT INTO cancha (nombre_cancha, tipo, precio_hora, estado) VALUES ($1, $2, $3, $4) RETURNING id_cancha";
-            const { rows } = await Connection.query(query, [nombre_cancha, tipo, precio_hora, estado]);
+            console.log('data dentro',canchaData)
+            const query = "INSERT INTO cancha (nombre_cancha, tipo, precio_hora, estado, img) VALUES ($1, $2, $3, $4, $5) RETURNING id_cancha";
+            const { rows } = await Connection.query(query, [nombre_cancha, tipo, precio_hora, estado, img]);
             return rows[0].id_cancha;
         } catch (error) {
             console.error("Error creating cancha:", error);
@@ -40,24 +38,40 @@ export class CanchaModel {
         }
     }
 
-    static async updateCancha(id_cancha, canchaData) {
-        try {
-            const { nombre_cancha, tipo, precio_hora, estado } = canchaData;
+static async updateCancha(id_Cancha, canchaData) {
+    try {
+        const { nombre_cancha, tipo, precio_hora, estado, img } = canchaData;
+        
+        const query = `
+            UPDATE cancha 
+            SET 
+                nombre_cancha = $1, 
+                tipo = $2, 
+                precio_hora = $3, 
+                estado = $4, 
+                img = $5
+            WHERE id_cancha = $6
+            RETURNING *`;
             
-            const query = `
-                UPDATE cancha 
-                SET nombre_cancha = $1, tipo = $2, precio_hora = $3, estado = $4 
-                WHERE id_cancha = $5 
-                RETURNING *
-            `;
-            
-            const { rows } = await Connection.query(query, [nombre_cancha, tipo, precio_hora, estado, id_cancha]);
-            return rows[0];
-        } catch (error) {
-            console.error("Error updating cancha:", error);
-            throw error;
+        const { rows } = await Connection.query(query, [
+            nombre_cancha, 
+            tipo, 
+            precio_hora, 
+            estado, 
+            img, 
+            id_Cancha
+        ]);
+        
+        if (rows.length === 0) {
+            throw new Error('Cancha no encontrada');
         }
+        
+        return rows[0];
+    } catch (error) {
+        console.error("Error updating cancha:", error);
+        throw error;
     }
+}
 
     static async deleteCancha(id_cancha) {
         const query = "DELETE FROM cancha WHERE id_cancha = $1 RETURNING id_cancha";

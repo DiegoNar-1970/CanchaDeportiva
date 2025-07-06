@@ -147,11 +147,33 @@ static async getReservasByUsuario(id_usuario) {
         }
     }
 
-    static async getAllReservas(startDate, endDate) {
-        const query = `SELECT * FROM reserva`
+    static async getAllReservas() {
+        const query = `SELECT 
+            u.nombre AS nombre,
+            c.nombre_cancha,
+            c.tipo,
+            r.id_reserva,
+            r.id_usuario,
+            r.id_cancha,
+            r.fecha_reserva,
+            r.hora_inicio,
+            r.hora_fin,
+            r.estado,
+            r.costo_total,
+            c.img AS img
+        FROM 
+            RESERVA r
+        JOIN 
+            USUARIO u ON r.id_usuario = u.id_usuario
+        JOIN 
+            CANCHA c ON r.id_cancha = c.id_cancha
+        `
+
         try {
             const { rows } = await Connection.query(query);
+
             return rows;
+            
         } catch (error) {
             console.error("Error fetching all reservas:", error);
             throw error;

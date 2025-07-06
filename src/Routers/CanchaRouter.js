@@ -3,7 +3,7 @@ import { CanchaController } from "../Controllers/CanchaController.js";
 
 export const CanchaRouter = Router();
 
-CanchaRouter.post("/", CanchaController.createCancha);
+CanchaRouter.post("/create", CanchaController.createCancha);
 CanchaRouter.get("/get-all", CanchaController.getAllCanchas);
 CanchaRouter.get("/:id", CanchaController.getCanchaById);
 CanchaRouter.put("/:id", CanchaController.updateCancha);
